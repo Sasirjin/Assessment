@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -55,13 +56,23 @@ namespace Assessment
         #region -   Methods     -
         private static void comparisonAssessment()
         {
-            //====================================== Generate randoms
+            //====================================== Title and explanation
+            writeEnclosedTitleAndExplanation(
+                "Comparison",
+                $"Given an array of integers (array) and a comparison integer (sum) as input, list all unique pairs that equal the comparison integer when summed."
+            );
+
+            //====================================== Generate randoms and two pairs
             Random rnd = new Random();
             var comparisonInteger = rnd.Next(1, 100);
-            var arrayOfIntegers = new int[12];
+            var arrayOfIntegers = new int[14];
+
+            // Add one and the comparison int as static
+            arrayOfIntegers[0] = 0;
+            arrayOfIntegers[1] = comparisonInteger;
 
             // add 9 random numbers, leaving the first zero
-            for (int x = 1; x < 12; x++)
+            for (int x = 2; x < 13; x++)
             {
                 rnd = new Random(DateTime.Now.Millisecond);
                 int newValue = 0;
@@ -74,17 +85,39 @@ namespace Assessment
                 arrayOfIntegers[x] = newValue;
             }
 
-            // Add one and the comparison int as static
-            arrayOfIntegers[10] = 1;
-            arrayOfIntegers[11] = comparisonInteger;
+            arrayOfIntegers[13] = (comparisonInteger - (arrayOfIntegers[rnd.Next(2, 12)]));
 
             //====================================== Title and explanation
-            writeEnclosedTitleAndExplanation(
-                "Comparison",
-                $"Given an array of integers ([{ String.Join(", ", arrayOfIntegers) }]) and a comparison integer ({ comparisonInteger }) as input, list all unique pairs that equal the comparison integer when summed."
-            );
+            pauseForEffect();
+            writeEnclosedLine($"Array: [{ String.Join(", ", arrayOfIntegers) }]");
+            pauseForEffect();
+            writeEnclosedLine($"Sum:   { comparisonInteger }");
 
+            //====================================== Transform and loop
+            List<Point> pairs = new List<Point>();
+            Array.Sort(arrayOfIntegers);
+            for (int pass1 = 0; pass1 < arrayOfIntegers.Length; pass1++)
+            {
+                var firstInteger = arrayOfIntegers[pass1];
+                for (int pass2 = pass1 + 1; pass2 < arrayOfIntegers.Length; pass2++)
+                {
+                    var secondInteger = arrayOfIntegers[pass2];
 
+                    if (firstInteger + secondInteger == comparisonInteger)
+                    {
+                        pairs.Add(new Point(firstInteger, secondInteger));
+                    }
+                    else if (firstInteger + secondInteger > comparisonInteger)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            //====================================== Write the output
+            pauseForEffect();
+            string outputPairs = String.Join(", ", pairs).Replace("X=","").Replace("Y=","");
+            writeEnclosedLine($"Pairs: { outputPairs}");
 
             //====================================== Close
             writeEndOfClosure();
